@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Path
+from typing import Optional
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -37,6 +38,12 @@ class User(BaseModel):
     age: int
     occupation: str
 
+# user class for updating
+class UserUpdate(BaseModel):
+    name: Optional[str]
+    age: Optional[int] 
+    occupation: Optional[str] 
+
 # Route parameters
 @app.get("/user/{user_id}")
 def get_users(user_id: int = Path(description="Enter the user ID")):
@@ -70,3 +77,31 @@ def create_user(user_id: int, user: User):
     
     users[user_id] = user
     return users
+
+# Put methods
+@app.put("/update-user")
+def update_user(user_id: int, user: UserUpdate):
+    if user_id not in users:
+        return {"error": f"User with id: {user_id} does not exist"}
+
+    # Access the existing user dictionary
+    existing_user = users[user_id]
+
+    # Update only the fields that are provided (i.e., not None)
+    if user.name is not None:
+        existing_user["name"] = user.name
+
+    if user.age is not None:
+        existing_user["age"] = user.age
+
+    if user.occupation is not None:
+        existing_user["occupation"] = user.occupation
+
+    # Return the updated user
+    return existing_user
+
+# testing something
+@app.get("/users")
+def get_users():
+    return users
+
