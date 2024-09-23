@@ -105,3 +105,12 @@ def update_user(user_id: int, user: UserUpdate):
 def get_users():
     return users
 
+# Delete method
+@app.delete("/delete-user/{user_id}")
+def delete_user(user_id: int):
+    # check if the user exists
+    if user_id not in users:
+        return {"error": "the user does not exist"}
+    
+    del users[user_id]
+    return users
